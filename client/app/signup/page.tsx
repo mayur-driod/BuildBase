@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/toast"
 import { DotMatrix } from "@/components/ui/dot-matrix"
 import { useAppearance } from "@/components/appearance-provider"
-import { Mail, Lock, User, Github, Loader2, Eye, EyeOff } from "lucide-react"
+import { Mail, Lock, User, GitHub, Loader2, Eye, EyeOff } from "lucide-react"
 
 export default function SignUpPage() {
   const router = useRouter()
@@ -147,7 +147,7 @@ export default function SignUpPage() {
             {isOAuthLoading === "github" ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
-              <Github className="mr-2 h-4 w-4" />
+              <GitHub className="mr-2 h-4 w-4" />
             )}
             Continue with GitHub
           </Button>

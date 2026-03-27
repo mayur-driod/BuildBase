@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/toast"
 import { DotMatrix } from "@/components/ui/dot-matrix"
 import { useAppearance } from "@/components/appearance-provider"
-import { Mail, Lock, Github, Loader2, Eye, EyeOff } from "lucide-react"
+import { Mail, Lock, GitHub, Loader2, Eye, EyeOff } from "lucide-react"
 
 const ERROR_MESSAGES: Record<string, string> = {
   CredentialsSignin: "Invalid email or password",
@@ -139,7 +139,7 @@ function LoginContent() {
             {isOAuthLoading === "github" ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
-              <Github className="mr-2 h-4 w-4" />
+              <GitHub className="mr-2 h-4 w-4" />
             )}
             Continue with GitHub
           </Button>
