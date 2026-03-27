@@ -25,7 +25,6 @@ import {
   EyeOff,
   Loader2,
   Camera,
-  Github,
   MapPin,
   Calendar,
   FileText,
@@ -35,6 +34,7 @@ import {
   Check,
   X,
 } from "lucide-react"
+import { FaGithub } from "react-icons/fa"
 
 export default function ProfilePage() {
   const { data: session, status } = useSession()
@@ -442,7 +442,7 @@ export default function ProfilePage() {
                     <div className="flex items-center justify-between p-3 rounded-lg border">
                       <div className="flex items-center gap-3">
                         <div className="p-2 rounded-full bg-muted">
-                          <Github className="h-4 w-4" />
+                          <FaGithub className="h-4 w-4" />
                         </div>
                         <div>
                           <p className="text-sm font-medium">GitHub</p>
