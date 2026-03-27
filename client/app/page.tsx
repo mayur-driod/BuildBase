@@ -1,63 +1,113 @@
-import Image from "next/image";
+"use client"
+
+import { Button } from "@/components/ui/button"
+import { useToast } from "@/components/ui/toast"
+import { useAppearance } from "@/components/appearance-provider"
 
 export default function Home() {
+  const { toast } = useToast()
+  const { appearance, setAccentColor, setDensityMode, setGlassEffects } = useAppearance()
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="flex flex-col items-center justify-center min-h-screen p-8 bg-background">
+      <main className="flex flex-col items-center gap-8 max-w-2xl">
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-bold tracking-tight">
+            Welcome to BuildBase
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-lg text-muted-foreground">
+            Your starter template with theme, appearance customization, and toast notifications
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="flex flex-col gap-4 w-full max-w-md">
+          <div className="p-6 rounded-lg border bg-card text-card-foreground space-y-4">
+            <h2 className="text-xl font-semibold">Features Included</h2>
+            <ul className="space-y-2 text-sm">
+              <li>✓ Theme Provider (Light/Dark mode support)</li>
+              <li>✓ Appearance Provider (Customizable colors, fonts, density)</li>
+              <li>✓ Toast Notifications</li>
+              <li>✓ Professional color system with OKLCH</li>
+              <li>✓ Glass effects and animations</li>
+              <li>✓ Responsive design utilities</li>
+            </ul>
+          </div>
+
+          <div className="p-6 rounded-lg border bg-card text-card-foreground space-y-4">
+            <h2 className="text-xl font-semibold">Quick Demo</h2>
+            <div className="space-y-2">
+              <Button
+                onClick={() => toast("Success! The template is working.", "success")}
+                className="w-full"
+              >
+                Show Success Toast
+              </Button>
+              <Button
+                onClick={() => toast("This is an info message", "info")}
+                variant="outline"
+                className="w-full"
+              >
+                Show Info Toast
+              </Button>
+            </div>
+          </div>
+
+          <div className="p-6 rounded-lg border bg-card text-card-foreground space-y-4">
+            <h2 className="text-xl font-semibold">Appearance Settings</h2>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm font-medium mb-2">Accent Colors</p>
+                <div className="flex gap-2 flex-wrap">
+                  {(['ocean', 'graphite', 'sage', 'violet', 'rose', 'amber', 'teal', 'coral'] as const).map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => setAccentColor(color)}
+                      className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                        appearance.accentColor === color
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                      }`}
+                    >
+                      {color}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm font-medium mb-2">Density Mode</p>
+                <div className="flex gap-2">
+                  {(['compact', 'comfortable', 'spacious'] as const).map((mode) => (
+                    <button
+                      key={mode}
+                      onClick={() => setDensityMode(mode)}
+                      className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                        appearance.densityMode === mode
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                      }`}
+                    >
+                      {mode}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm font-medium mb-2">Glass Effects</p>
+                <button
+                  onClick={() => setGlassEffects(!appearance.glassEffects)}
+                  className="px-3 py-1 text-xs rounded-full border bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
+                >
+                  {appearance.glassEffects ? 'Disable' : 'Enable'} Glass Effects
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center text-sm text-muted-foreground">
+            <p>Start building by editing <code className="px-2 py-1 bg-muted rounded">app/page.tsx</code></p>
+          </div>
         </div>
       </main>
     </div>
