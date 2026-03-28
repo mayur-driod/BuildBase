@@ -3,20 +3,29 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTheme } from 'next-themes';
 import createGlobe from 'cobe';
-import { useAppearance } from '@/components/appearance-provider';
 import Link from 'next/link';
 
-// Indian cities with coaching institutes/MSMEs
+type BusinessLocation = {
+  city: string;
+  lat: number;
+  lng: number;
+  intensity: number;
+};
+
+// Key Indian business hubs (lat/lng in degrees)
 const BUSINESS_LOCATIONS = [
-  { lat: 12.9716, lng: 77.5946, city: 'Bangalore', intensity: 0.9 },
-  { lat: 19.0760, lng: 72.8777, city: 'Mumbai', intensity: 1.0 },
-  { lat: 22.5726, lng: 88.3639, city: 'Kolkata', intensity: 0.7 },
-  { lat: 13.0827, lng: 80.2707, city: 'Chennai', intensity: 0.8 },
-  { lat: 28.6139, lng: 77.2090, city: 'Delhi', intensity: 0.95 },
-  { lat: 23.0225, lng: 72.5714, city: 'Ahmedabad', intensity: 0.75 },
-  { lat: 18.5204, lng: 73.8567, city: 'Pune', intensity: 0.85 },
-  { lat: 17.3850, lng: 78.4867, city: 'Hyderabad', intensity: 0.8 },
-];
+  { city: 'Mumbai', lat: 19.076, lng: 72.8777, intensity: 1 },
+  { city: 'Delhi', lat: 28.6139, lng: 77.209, intensity: 0.95 },
+  { city: 'Bengaluru', lat: 12.9716, lng: 77.5946, intensity: 0.9 },
+  { city: 'Pune', lat: 18.5204, lng: 73.8567, intensity: 0.85 },
+  { city: 'Hyderabad', lat: 17.385, lng: 78.4867, intensity: 0.82 },
+  { city: 'Chennai', lat: 13.0827, lng: 80.2707, intensity: 0.8 },
+  { city: 'Ahmedabad', lat: 23.0225, lng: 72.5714, intensity: 0.76 },
+  { city: 'Kolkata', lat: 22.5726, lng: 88.3639, intensity: 0.72 },
+] as const satisfies readonly BusinessLocation[];
+
+const INDIA_LONGITUDE_CENTER = 77.2;
+const INITIAL_PHI = -(INDIA_LONGITUDE_CENTER * Math.PI) / 180;
 
 // Custom hook to handle hydration
 function useIsMounted() {
@@ -39,7 +48,6 @@ export default function GlobeHero() {
   const [isLoaded, setIsLoaded] = useState(false);
   const { resolvedTheme } = useTheme();
   const mounted = useIsMounted();
-  const { appearance } = useAppearance();
 
   const isDark = mounted && resolvedTheme === 'dark';
 
@@ -50,38 +58,46 @@ export default function GlobeHero() {
       canvasRef.current.style.opacity = '0';
     }
 
-    let phi = 0;
+    let phi = INITIAL_PHI;
     let width = 0;
+    const devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2);
     const onResize = () => canvasRef.current && (width = canvasRef.current.offsetWidth);
     window.addEventListener('resize', onResize);
     onResize();
 
-    const markers = BUSINESS_LOCATIONS.map(loc => ({
+    const markers = BUSINESS_LOCATIONS.map((loc) => ({
+      // cobe expects [latitude, longitude]
       location: [loc.lat, loc.lng] as [number, number],
-      size: 0.03 + loc.intensity * 0.07,
+      // Smaller markers avoid visual overlap and improve geographic readability
+      size: 0.018 + loc.intensity * 0.028,
     }));
 
     const globe = createGlobe(canvasRef.current!, {
-      devicePixelRatio: 2,
-      width: width * 2,
-      height: width * 2,
-      phi: 0,
-      theta: 0.3,
+      devicePixelRatio,
+      width: width * devicePixelRatio,
+      height: width * devicePixelRatio,
+      phi: INITIAL_PHI,
+      theta: 0.28,
       dark: isDark ? 1 : 0,
-      diffuse: 0.4,
-      mapSamples: 20000,
-      mapBrightness: isDark ? 6 : 1.2,
-      baseColor: isDark ? [0.3, 0.3, 0.3] as [number, number, number] : [1, 1, 1] as [number, number, number],
+      diffuse: 1.1,
+      scale: 1,
+      offset: [0, 0] as [number, number],
+      // Higher sample count sharpens coastlines and avoids merged-looking landmasses.
+      mapSamples: width > 560 ? 36000 : 26000,
+      // Push land dots forward while fading ocean/base dots back.
+      mapBrightness: isDark ? 7 : 5.2,
+      mapBaseBrightness: isDark ? 0.08 : 0.12,
+      baseColor: isDark ? [0.24, 0.24, 0.24] as [number, number, number] : [1, 1, 1] as [number, number, number],
       markerColor: [0.1, 0.8, 0.5] as [number, number, number], // Green for BuildBase
-      glowColor: isDark ? [0.1, 0.1, 0.1] as [number, number, number] : [0.8, 0.8, 0.8] as [number, number, number],
+      glowColor: isDark ? [0.1, 0.1, 0.1] as [number, number, number] : [0.82, 0.82, 0.82] as [number, number, number],
       markers,
       onRender: (state) => {
         if (!pointerInteracting.current) {
           phi += 0.005;
         }
         state.phi = phi + pointerInteractionMovement.current / 200;
-        state.width = width * 2;
-        state.height = width * 2;
+        state.width = width * devicePixelRatio;
+        state.height = width * devicePixelRatio;
       },
     });
 
