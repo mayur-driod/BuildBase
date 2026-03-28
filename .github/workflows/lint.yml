@@ -19,21 +19,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            server/package-lock.json
+            client/package-lock.json
 
       # ---- API ----
       - name: Install API dependencies
-        working-directory: apps/api
+        working-directory: server
         run: npm ci
 
       - name: Lint API
-        working-directory: apps/api
+        working-directory: server
         run: npm run lint
 
       # ---- WEB ----
       - name: Install Web dependencies
-        working-directory: apps/web
+        working-directory: client
         run: npm ci
 
       - name: Lint Web
-        working-directory: apps/web
+        working-directory: client
         run: npm run lint
