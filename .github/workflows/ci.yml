@@ -1,15 +1,27 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   api:
     name: API (NestJS)
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    env:
+      CI: true
 
     defaults:
       run:
@@ -35,9 +47,19 @@ jobs:
       - name: Lint
         run: npm run lint --if-present
 
+      - name: Unit tests
+        run: npm run test --if-present -- --ci
+
+      - name: E2E tests
+        run: npm run test:e2e --if-present -- --ci
+
   web:
     name: Web (Next.js)
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    env:
+      CI: true
 
     defaults:
       run:
@@ -65,3 +87,6 @@ jobs:
 
       - name: Lint
         run: npm run lint --if-present
+
+      - name: Test (if configured)
+        run: npm run test --if-present -- --ci

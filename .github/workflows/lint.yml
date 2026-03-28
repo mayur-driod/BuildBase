@@ -1,15 +1,27 @@
 name: Lint
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: lint-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint:
     name: Lint API & Web
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      CI: true
 
     steps:
       - name: Checkout repo
