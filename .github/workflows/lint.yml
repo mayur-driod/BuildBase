@@ -1,0 +1,39 @@
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint API & Web
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # ---- API ----
+      - name: Install API dependencies
+        working-directory: apps/api
+        run: npm ci
+
+      - name: Lint API
+        working-directory: apps/api
+        run: npm run lint
+
+      # ---- WEB ----
+      - name: Install Web dependencies
+        working-directory: apps/web
+        run: npm ci
+
+      - name: Lint Web
+        working-directory: apps/web
+        run: npm run lint
