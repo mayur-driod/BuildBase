@@ -1,0 +1,55 @@
+name: Lint
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lint-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint API & Web
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      CI: true
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            server/package-lock.json
+            client/package-lock.json
+
+      # ---- API ----
+      - name: Install API dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Lint API
+        working-directory: server
+        run: npm run lint
+
+      # ---- WEB ----
+      - name: Install Web dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: Lint Web
+        working-directory: client
+        run: npm run lint
