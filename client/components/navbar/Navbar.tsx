@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useToast } from '@/components/ui/toast';
 import { ModeToggle } from '@/components/mode-toggle/modeToggle';
 import { cn } from '@/lib/utils';
 
@@ -28,6 +29,9 @@ export function Navbar() {
   const [menuState, setMenuState] = React.useState(false);
   const [isScrolled, setIsScrolled] = React.useState(false);
   const { data: session, status } = useSession();
+  const { toast } = useToast();
+  const hasMounted = React.useRef(false);
+  const previousStatus = React.useRef(status);
   const user = session?.user;
   const isLoading = status === 'loading';
 
@@ -52,6 +56,24 @@ export function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  React.useEffect(() => {
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      previousStatus.current = status;
+      return;
+    }
+
+    if (previousStatus.current !== 'authenticated' && status === 'authenticated') {
+      toast(`Signed in${user?.name ? ` as ${user.name}` : ''}`, 'success');
+    }
+
+    if (previousStatus.current === 'authenticated' && status === 'unauthenticated') {
+      toast('Signed out successfully', 'info');
+    }
+
+    previousStatus.current = status;
+  }, [status, user?.name, toast]);
 
   return (
     <header>
